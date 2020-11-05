@@ -115,12 +115,12 @@ class ObjectDetector(object):
     output_dict = self.model(input_tensor)
 
     num_detections = int(output_dict.pop('num_detections'))
-    output_dict = {key:value[0, :num_detections].numpy() 
+    output_dict = {key:value[0, :num_detections].numpy()
                    for key,value in output_dict.items()}
     boxes = output_dict['detection_boxes']
     classes = output_dict['detection_classes'].astype(np.int64)
     scores = output_dict['detection_scores']
-   
+
     return boxes, scores, classes, num_detections
 
 
@@ -148,9 +148,17 @@ def detect_objects(image_path):
   image.thumbnail((480, 480), Image.ANTIALIAS)
 
   new_images = {}
+  detection_count = {}
   for i in range(num_detections):
     if scores[i] < 0.7: continue
+
     cls = classes[i]
+
+    if client.category_index[cls]['name'] not in detection_count.keys():
+      detection_count[client.category_index[cls]['name']] = 1
+    else:
+      detection_count[client.category_index[cls]['name']] += 1
+
     if cls not in new_images.keys():
       new_images[cls] = image.copy()
     draw_bounding_box_on_image(new_images[cls], boxes[i],
@@ -163,13 +171,13 @@ def detect_objects(image_path):
     category = client.category_index[cls]['name']
     result[category] = encode_image(new_image)
 
-  return result
+  return result, detection_count
 
 
 @app.route('/')
 def upload():
   photo_form = PhotoForm(request.form)
-  return render_template('upload.html', photo_form=photo_form, result={})
+  return render_template('upload.html', photo_form=photo_form, result={}, detection_count={})
 
 
 @app.route('/post', methods=['GET', 'POST'])
@@ -179,11 +187,11 @@ def post():
     with tempfile.NamedTemporaryFile() as temp:
       form.input_photo.data.save(temp)
       temp.flush()
-      result = detect_objects(temp.name)
+      result, detection_count = detect_objects(temp.name)
 
     photo_form = PhotoForm(request.form)
     return render_template('upload.html',
-                           photo_form=photo_form, result=result)
+                           photo_form=photo_form, result=result, detection_count=detection_count)
   else:
     return redirect(url_for('upload'))
 

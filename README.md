@@ -1,5 +1,9 @@
 # TensorFlow Object Detection API demo
 
+NOTE: This forked project contains the following edits:
+* It displays the number of detected objects to the right of the label name.
+* A Dockerfile has been defined to use this application in a container.
+
 Disclaimer: This is not an official Google product.
 
 This is an example application demonstrating how
@@ -113,7 +117,7 @@ Jan 02 23:55:40 od-test app.py[17136]:  * Running on http://0.0.0.0:80/ (Press C
 ```
 
 You have to wait around 60secs for the application to finish loading
- the pretrained model graph. You'll see the message 
+ the pretrained model graph. You'll see the message
  `Running on http://0.0.0.0:80/ (Press CTRL+C to quit)` when it's ready.
 
 Now you can access the instance's static IP address using a web browser.

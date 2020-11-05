@@ -50,7 +50,7 @@
           {% for name, img in result.items() %}
             {% if name != 'original' %}
               <a href="javascript:void(0);"
-                 onclick="ChangePhoto('{{ name }}', '{{ result[ name ] }}');">{{ name }}</a>
+                 onclick="ChangePhoto('{{ name }}', '{{ result[ name ] }}');">{{ name }} ({{ detection_count[name] }} found)</a>
               </br>
             {% endif %}
           {% endfor %}
